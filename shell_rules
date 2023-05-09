@@ -1,0 +1,341 @@
+# 01-Print
+
+# print command
+echo Hello World
+
+# adding color to text >> command
+echo -e "\e[31m Hello World \e[0m"
+enable color >> \e[31m
+disable color >> \e[31m
+
+# Some times we need to print multiple lines
+echo -e " line1 \nline2 \nline3 "
+##   "\e" for color,       >> echo -e "\e[31m Hello World \e[0m"
+##   "\n" for new line,    >> echo -e "Hello \nWorld \nUniverse"
+##   "\t" for tab spaces   >> echo -e "Hello \tWorld \tUniverse"
+
+# Color Code - Red(31m), Green(32m), Yellow(33m), Blue(34m), Magenta(35m), Cyan(36m)
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+# 02-Variables
+
+# simple variable----------------------------------------
+DATE=2023-02-17                                      >> (declaring variable)
+echo "Hello, Good Morning, Today Date is ${DATE}"    >> calling the declared variable
+
+# Command Substitution-----------------------------------------
+DATE=$(date)                                         >> (declaring variable)
+echo "Hello, Good Morning, Today Date is ${DATE}"    >> calling the declared variable
+
+# Arithmetic Substitution-------------------------------------------------
+ADD=$((2+3))                                          >> (declaring variable)
+echo "Addition of 2+3 = ${ADD}"                       >> calling the declared variable
+
+## Accessing Variable from Shell----------------------------------------------
+echo a = $a
+
+# Rules for variable_name------------------------------------------------------
+# variable_name can have ( 0-9, a-z, “_” )
+# Variable name can ONLY start with  ( a-z, “_” )
+
+# Environmental variable----------------------------------------------------------
+type-1 >> INJECT value of variable to a PARTICULAR shell scripts
+b=100 c=200 variables.sh
+
+type-2 >> INJECT value of variable to ALL the shell scripts
+$ a=100
+$ export a  >> syntax: export <variable_name>
+
+# Special Variables for Inputs--------------------------------------------------
+# 0-n , $*/$@, $#
+1. echo First Argument $1 # First Argument
+2. echo Second Argument $2 # Second Argument
+
+3. echo Script Name $0 # Script Name
+
+4. echo All Arguments = $* # All Arguments
+5. echo All Arguments = $@ # All Arguments
+
+6. echo Number of Arguments = $# # Number of Arguments
+
+# for conceptual clarity-----------------------------------------------------------------------------------
+Example of a bash script if a user gives arguments, then the arguments are loaded inside the script
+# creating a shell_script file
+$ vi script1.sh
+echo “0 is $0”
+echo “1 is $1”
+echo “2 is $2”
+echo “3 is $3”
+echo “* is $*”
+echo “@ is $@”
+echo “# is $#”
+
+# running the shell_script file with user arguments
+$ bash script1.sh 10 20 abc       # user arguments/inputs while running a shell script
+echo “0 is script1.sh”            # $0 means name of the script >> script1.sh
+echo “1 is 10”
+echo “2 is 20”
+echo “3 is abc”
+echo “* is 10 20 abc”
+echo “@ is 10 20 abc”
+echo “# is 3”
+
+Observe: BashScript will have its own values / inputs >> (abc 10 20 30 40 50)
+       Function will also have its own values / inputs >> (xyz 20 100 200 300 500)
+       so u need to call a "function or bashScript" by giving separate separate values
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+# 03- if_condition------------------------------------------------------------------------------------
+
+fruit_name=$1        >> declaring a variable   (input from First_Argument, so that the First_Argument will be picked, and injected inside if_condition )
+quantity=$2        >> declaring a variable   (input from Second_Argument, so that the Second_Argument will be picked, and injected inside if_condition)
+
+# simple if ----------------------------------------------------------------------------------------
+if [ -z "$fruit_name" ]; then     # then can go in next line as well, also semi colan is also fine in the same line
+  echo Input Missing
+  exit
+fi
+
+# if_else (string_expression)-------------------------------------------------------------------------------------------
+if [ "$fruit_name" == "mango" ]
+then
+  echo Mango Quantity - $quantity
+else
+  echo Fruit does not exist
+fi
+
+# if_else (number_expression)-------------------------------------------------------------------------------------------
+if [ "$quantity" -gt 100 ]; then
+  echo Mango Price - 0.5$
+else
+  echo Mango Price - 1$
+fi
+
+## It is always a good practice to (use and double_quote) the variables in expressions
+
+real_example------------------------------------------------------------------------------------------------------------
+  PRINT_HEAD "Add application User"
+  id roboshop &>> /tmp/roboshop.log
+  if [ $? -ne 0 ]
+  then
+  useradd roboshop &>> /tmp/roboshop.log
+  fi
+  STATUS_CHECK
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+# 04- Loops
+
+# Loop based on expression-----------------------------------------------------------------------------
+i=20
+while [ $i -gt 0 ]; do
+  echo  $i
+  i=$(($i-1))    # declaring variable with "Arithmetic Substitution" & you cannot change variable_name "i", it has to be "i" only
+  sleep 1
+done
+
+
+## Loop based on inputs-----------------------------------------------------------------------------
+for i in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 ; do
+  echo $i
+  sleep 1
+done
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+# 05- Functions
+# Functions are like variables
+# Variable - When we assign a name to a set of data then it is a variable.
+# Function - When we assign a name to a set of commands then it is function.
+
+
+# Example-1 --------------------------------------------------------------------------------
+# Declare Function
+example1() {
+  echo I am a example function
+  echo a - $a
+  b=20
+}
+
+## Call a function
+a=10
+example1
+echo b - $b
+
+observe that, inside the function_example1 variable_a is not declared,
+but inside the function_example1 variable_a is called
+in this situation variable_a declared outside the function will go inside the function
+but VICE_VERSA is not possible (refer: # Example-3)
+
+# Example-2 --------------------------------------------------------------------------------
+# Declare Function
+example2() {
+  echo example1 - abc
+  return 2
+  echo example2 - xyz
+}
+
+# finding return status of function_example2
+echo $?
+
+# shell_file is a group of commands, if exit command is used inside shell_file, it will completely exit the script
+# if exit command is used as part of function, it will completely exit the script
+# so "Return" >> it will come out of the function to the main program without exiting the script
+# Return by default will give rc=0. To return some other number ranging 0-255 >> “return 2”
+
+# Example-3 -------- We can send inputs to the function and we can access them with special variables $1-$n, $*, $#-----------
+## Declare a function
+xyz() {
+  echo Hello from Function
+  echo First Argument - $1
+  echo Second Argument -- $2
+  echo All Arguments - $*
+  echo No of Arguments - $#
+  a=300                             # variable_a is declared
+  echo Value of a = $a
+  b=200                             # variable_b is declared
+}
+
+## Call a function
+a=120
+xyz 123 456                  # inputs to the function, 123 is Argument1, 456 is Argument2
+echo Value of b - $b
+
+observe that, inside the function_xyz (variable_a & variable_b) are declared,
+but if outside the function_xyz (variable_a & variable_b) are declared with different values,
+such outside the function_xyz declared values of (variable_a & variable_b) CANNOT overwrite values of (variable_a & variable_b) declared inside the function_xyz
+in this situation (variable_a & variable_b) declared outside the function cannot go inside the function_xyz
+but VICE_VERSA is possible (refer: # Example-1)
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+# 05- SED                        1                  2            3               4              5
+# SED -Stream Line Editor (substitute a word - ADD a Line - Insert a Line - Change a Line - Delete a Line)
+# all the above options can be used >> "based on Line_Number" or "based on Word_Search"
+
+Option-1.1 --------------------substitute a word (basic_usage)---------------------------------------------------------
+dynamically replacing/Substitute a word in a file, without opening the file
+replace listen address from 127.0.0.1 to 0.0.0.0
+Syntax: sed -i -e 's/old/new/g' <file_name>                          # g = globally in every line substitute word
+command: sed -i -e 's/127.0.0.1/0.0.0.0/' /etc/{component}.conf
+
+Option-1.2 --------------------substitute a word (based on Line_Number)------------------------------------------------
+Syntax: sed -i -e '<line_number>s/old/new/g' <file_name>          # based on Line_Number
+command: sed -e '10s/mongo/xyz/g' /etc/mongod.conf
+
+Option-1.3 --------------------substitute a word (based on Word_Search)------------------------------------------------
+Syntax:  sed -i -e '/<word>/ s/old/new/g' <file_name>          # based on Word_Search
+command: sed -e '/reference/ s/mongo/xyz/' /etc/mongod.conf
+
+
+Option-2.1 ----------------------Delete a Line (using_Line_Number)------------------------------------------------------
+To delete 5 to 100 lines
+command: sed -i -e ‘5,100d’ passwd                        # d = delete
+syntax: sed -i -e ‘5,100d’ <file_name>
+
+Option-2.2 ----------------------Delete a Line (using_Word_Search)------------------------------------------------------
+To delete 5 to 100 lines
+command: sed -i -e ‘/root/ d’ passwd                        # d = delete
+syntax: sed -i -e ‘/word/ d’ <file_name>
+
+Example-3.1 --------------------Insert a Line (using_Line_Number)----------------------------------------------------
+Based on LINE_NUMBER creating NEW LINE-1
+$ sed -i -e ‘1 i Hello’ /tmp/passwd                       # i = insert
+New line-1 will be created with Hello
+
+Example-3.2 --------------------Insert a Line (using_Word_Search)----------------------------------------------------
+Based on WORD search Inserting New line  >> Insert
+$ sed -i -e ‘/shutdown/  i Hello’ /tmp/passwd            # i = insert
+
+
+Example-4.1 ---------------------Add a Line (using_Line_Number)-------------------------------------------------------
+Based on LINE_NUMBER adding/appending new line to existing Line-1
+$ sed -i -e ‘1 a Hello’ /tmp/passwd                       # a = add/append
+Entire line-1 will be undisturbed,
+But to the Line-1 , we will have next Line-2 as Hello
+
+Example-4.2 ------------------------Add a Line (using_Word_Search)-----------------------------------------------------
+Based on word search adding/appending new line to existing Line  >> Add/append
+$ sed -i -e ‘/shutdown/  a Hello’ /tmp/passwd            # a = add/append
+
+
+Example-5.1 --------------------------Change a Line (using_Line_Number)-----------------------------------------------
+Based on LINE_NUMBER replace existing LINE-1
+$ sed -i -e ‘1 c Hello’ /tmp/passwd                      # c = change
+Entire line-1 will be replaced with Hello
+
+Example-5.2 ---------------------------Change a Line (using_Word_Search)-----------------------------------------------
+Based on word search replace existing LINE >> REPLACE
+$ sed -i -e ‘/shutdown/  c Hello’ /tmp/passwd             # c = change
+It will search for line shutdown, if shutdown word is found in a line,
+then that particular ENTIRE line will be replaced with Hello
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+06- Redirectors
+
+# Feature-1
+< = loading a file
+Example: $ mongo --host MONGODB-SERVER-IPADDRESS </app/schema/catalogue.js
+
+# Feature-2.1
+> = sending the output to the file
+Example:
+ls >/tmp/out          # output is redirected to /tmp/out
+Usually above command “ > “ will overwrite existing content in /tmp/out
+
+# Feature-2.2
+In order to not to overwrite i.e to append content inside /tmp/out
+Use “ >> “
+head /etc/passwd >>/tmp/out
+
+# Feature-3
+both OUTPUT & ERROR to redirect to same file use &>>${LOG_FILE}
+
+Feature-4
+if we dont want output to be stored to a separate file, to save memory Redirect to “ &>/dev/null ”
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+07 - Passwords_in Shell Script
+
+# to check if the variable "roboshop_mysql_password" is empty or not
+# if variable is empty then -z = true >> enter roboshop_mysql_password
+if [ -z "roboshop_{component}_password"]
+then
+  echo -e "\e[31m enter roboshop_{component}_password \e[0m"
+fi
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+08- Best way of monitoring the logs is >> $ tail -f
+-f = follow
+tail = it will show last 10 lines in a file
+$ systemctl restart shipping; tail -f /var/log/messages
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+09 - If you are using environment variable in sudo then use >> -E
+-E = it will preserve the environment variable
+$ sudo -E bash rabbitmq.sh
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
