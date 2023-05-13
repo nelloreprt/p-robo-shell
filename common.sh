@@ -13,6 +13,7 @@ STATUS_CHECK() {
 PRINT_HEAD() {
   echo -e "\e[31m $1 \e[0m"
 }
+
 NODEJS() {
   PRINT_HEAD "Setup NodeJS repos"
   curl -sL https://rpm.nodesource.com/setup_lts.x | bash  &>> /tmp/roboshop.log
@@ -86,6 +87,10 @@ load_schema() {
 if [${load_schema} == true]
 then
 if [${schema_type} == mongo]
+  PRINT_HEAD "Setup the MongoDB repo file"
+  cp ${path}/files/mongo.repo /etc/yum.repos.d/mongo.repo  &>> /tmp/roboshop.log
+  STATUS_CHECK
+
   PRINT_HEAD "install mongodb-client"
   yum install mongodb-org-shell -y &>> /tmp/roboshop.log
   STATUS_CHECK

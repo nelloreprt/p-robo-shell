@@ -8,8 +8,6 @@ NODEJS
 
 APP_PREREQ
 
-load_schema
-
 systemd_setup
 
 # this step is already done in mongodb, so not required in catalogue.sh
